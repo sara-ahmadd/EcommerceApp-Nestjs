@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { UserService } from '../user/user.service';
 import { UserRepository } from '../user/user.repository';
-import { UserModel } from 'src/DB/models/user.model';
+import { UserModel } from './../../DB/models/user.model';
 
 @Module({
   imports: [UserModel],

@@ -3,13 +3,10 @@ import {
   CanActivate,
   ExecutionContext,
   Injectable,
-  NotFoundException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Request } from 'express';
-import { UserRoles } from 'src/modules/user/create-user.dto';
-import { UserService } from 'src/modules/user/user.service';
-import { verifyToken } from 'src/utils/token';
+import { UserRoles } from '../../modules/user/create-user.dto';
+import { UserService } from '../../modules/user/user.service';
 
 @Injectable()
 export class AuthorizationGuard implements CanActivate {

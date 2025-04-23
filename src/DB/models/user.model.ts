@@ -2,9 +2,9 @@
 
 import { MongooseModule, Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { UserRoles } from 'src/modules/user/create-user.dto';
-import { encryptText } from 'src/utils/encryptText';
-import { hashText } from 'src/utils/hashText';
+import { UserRoles } from './../../modules/user/create-user.dto';
+import { encryptText } from './../../utils/encryptText';
+import { hashText } from './../../utils/hashText';
 
 export enum otpTypes {
   confirmEmail = 'confirmEmail',

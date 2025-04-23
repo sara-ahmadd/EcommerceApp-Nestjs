@@ -1,10 +1,10 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { otpTypes } from 'src/DB/models/user.model';
-import { resetPasswordTemplate } from 'src/utils/emails/resetPassword';
-import { compareHash, hashText } from 'src/utils/hashText';
-import { generateToken, verifyToken } from 'src/utils/token';
+import { otpTypes } from '../../DB/models/user.model';
+import { resetPasswordTemplate } from '../../utils/emails/resetPassword';
+import { compareHash, hashText } from '../../utils/hashText';
+import { generateToken, verifyToken } from '../../utils/token';
 import { CreateUserDto } from '../user/create-user.dto';
 import { UserRepository } from '../user/user.repository';
 import { UserService } from '../user/user.service';
@@ -15,7 +15,6 @@ import {
   VerifyEmailDto,
 } from './auth.dto';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { decrypt } from 'src/utils/encryptText';
 
 @Injectable()
 export class AuthService {

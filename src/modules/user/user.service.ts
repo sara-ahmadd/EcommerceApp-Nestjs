@@ -1,18 +1,16 @@
+import { MailerService } from '@nestjs-modules/mailer';
 import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import * as otpGenerator from 'otp-generator';
+import { otpTypes, UserDocument } from '../../DB/models/user.model';
+import { decrypt } from '../../utils/encryptText';
+import { emailVerificationTemplate } from '../../utils/emails/emailVerification';
 import { CreateUserDto } from './create-user.dto';
 import { UserRepository } from './user.repository';
-import { otpTypes, UserDocument } from 'src/DB/models/user.model';
-import { MailerService } from '@nestjs-modules/mailer';
-import * as otpGenerator from 'otp-generator';
-import { emailVerificationTemplate } from 'src/utils/emails/emailVerification';
-import { Types } from 'mongoose';
-import { verifyToken } from 'src/utils/token';
-import { decrypt } from 'src/utils/encryptText';
 
 @Injectable()
 export class UserService {
