@@ -1,0 +1,7 @@
+{
+  "watch": ["src"],
+  "ext": "ts",
+  "exec": "npm run start:dev",
+  "legacy-watch": true,
+  "polling-interval": 1000
+}

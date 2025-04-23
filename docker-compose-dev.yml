@@ -1,0 +1,20 @@
+version: 'v2.32.4'
+
+services:
+  ecommerce-nestjs-app-dev:
+    build:
+      context: .
+      target: dev
+    container_name: 'ecommerce-nestjs-app-dev-cont'
+    ports:
+      - '8000:8000'
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=development
+    command: npm run start:dev # Ensure NestJS runs in watch mode
+  redis:
+    image: 'redis:latest'
+    container_name: redis-cache
+    ports:
+      - '6379:6379'

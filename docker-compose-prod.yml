@@ -1,0 +1,18 @@
+version: 'v2.32.4'
+
+services:
+  ecommerce-nestjs-app-prod:
+    build:
+      context: .
+      target: prod
+    container_name: 'ecommerce-nestjs-app-prod-cont'
+    ports:
+      - '8000:8000'
+    env_file:
+      - .env
+
+  redis:
+    image: 'redis:latest'
+    container_name: redis-cache
+    ports:
+      - '6379:6379'
