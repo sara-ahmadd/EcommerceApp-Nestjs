@@ -6,7 +6,7 @@ import {
   SchemaFactory,
 } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
-import { IImage } from 'src/common/types/image.type';
+import { IImage } from './../../common/types/image.type';
 import { UserModelName } from './user.model';
 import slugify from 'slugify';
 import { HydratedDocument } from 'mongoose';

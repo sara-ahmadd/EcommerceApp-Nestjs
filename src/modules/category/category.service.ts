@@ -1,6 +1,5 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { CategoryDocument } from './../../DB/models/category.model';
-// import { CategoryDocument } from 'src/DB/models/category.model';
 import { CategoryRepository } from './category.repository';
 
 @Injectable()
