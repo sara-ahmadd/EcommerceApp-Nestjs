@@ -7,23 +7,26 @@ import {
   InternalServerErrorException,
   NestInterceptor,
 } from '@nestjs/common';
-import { catchError, Observable } from 'rxjs';
+import { catchError, Observable, ObservableInput, tap, throwError } from 'rxjs';
 
 @Injectable()
 export class ErrorHandlerInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler<any>): any {
     return next.handle().pipe(
-      catchError((error) => {
+      tap((res) => {}),
+      catchError((error): ObservableInput<HttpException> => {
+        console.log('from error handling interceptor');
         const res = context.switchToHttp().getResponse();
         const status =
           error instanceof HttpException
             ? error.getStatus()
             : HttpStatus.INTERNAL_SERVER_ERROR;
-        return res.status(status).json({
+        const errObj = {
           status: 'Error',
           error: error.message,
           stack: error.stack,
-        });
+        };
+        return throwError(() => new HttpException(errObj, status));
       }),
     );
   }

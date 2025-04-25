@@ -11,6 +11,8 @@ import { decrypt } from '../../utils/encryptText';
 import { emailVerificationTemplate } from '../../utils/emails/emailVerification';
 import { CreateUserDto } from './create-user.dto';
 import { UserRepository } from './user.repository';
+import { Types } from 'mongoose';
+import { GetUsersDto } from './get-users.dto';
 
 @Injectable()
 export class UserService {
@@ -83,5 +85,37 @@ export class UserService {
     } catch (error) {
       throw new BadRequestException(error);
     }
+  }
+
+  async updateUserProfile(body: Partial<UserDocument>, userId: Types.ObjectId) {
+    const { name, phone, address, email } = body;
+    const user = await this._UserRepo.findOne({ filter: { _id: userId } });
+    if (!user) throw new NotFoundException('user is not found');
+    if (!user.isVerified) throw new BadRequestException('user is not verified');
+
+    user.name = name ?? user.name;
+    user.address = address ?? user.address;
+    user.phone = phone ?? user.phone;
+    user.email = email ?? user.email;
+    await user.save();
+    const updatedUser = await this._UserRepo.findOne({
+      filter: { _id: userId },
+    });
+    return {
+      message: 'User is updated successfully',
+      user: {
+        name: updatedUser?.name,
+        address: updatedUser?.address,
+        email: updatedUser?.email,
+        phone: decrypt({ cypherText: updatedUser?.phone }),
+      },
+    };
+  }
+  async getAllUsers(query: GetUsersDto) {
+    const users = await this._UserRepo.findAll({
+      filter: {},
+      page: query.page ?? 1,
+    });
+    return { message: 'users fetched successfully', ...users };
   }
 }

@@ -11,18 +11,11 @@ export abstract class AbstractDBRepository<TDoc> {
     filter = {},
     populate = '',
     select = '',
-    page = 0,
-    limit = 0,
+    page = 1,
+    limit = 5,
     sort = 0,
   }) {
-    let query = this.model.find({
-      filter,
-      populate,
-      select,
-      page,
-      limit,
-      sort,
-    });
+    let query = this.model.find(filter);
     if (populate) query = query.populate(populate);
     if (select) query = query.select(select);
     if (page && limit) {

@@ -1,7 +1,13 @@
-import { Controller, Get } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Query } from '@nestjs/common';
 import { User } from './../../common/decorators/user.decorator';
 import { UserDocument } from './../../DB/models/user.model';
 import { UserService } from './user.service';
+import { Types } from 'mongoose';
+import { ParseObjectIdPipe } from '@nestjs/mongoose';
+import { UpdateUserDto } from './update-user.dto';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { UserRoles } from './create-user.dto';
+import { GetUsersDto } from './get-users.dto';
 
 @Controller('/user')
 export class UserController {
@@ -10,5 +16,20 @@ export class UserController {
   @Get('/profile')
   getUserProfile(@User() user: Partial<UserDocument>) {
     return this._UserService.getUserProfile(user);
+  }
+
+  @Patch('/profile')
+  updateUserProfile(
+    @Body() body: UpdateUserDto,
+    @User('_id', ParseObjectIdPipe) userId: Types.ObjectId,
+  ) {
+    return this._UserService.updateUserProfile(body, userId);
+  }
+
+  @Roles(UserRoles.admin)
+  @Get('/all_users')
+  getAllUsers(@Query() query: GetUsersDto) {
+    console.log(query);
+    return this._UserService.getAllUsers(query);
   }
 }

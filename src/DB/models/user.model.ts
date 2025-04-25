@@ -11,18 +11,6 @@ export enum otpTypes {
   forgetPassword = 'forgetPassword',
 }
 
-/**
- * const otpSchema = new Schema({
-  otpType: {
-    type: String,
-    enum: [otpTypes.confirmEmail, otpTypes.forgetPassword],
-    required: true,
-  },
-  code: { type: String },
-  expiresIn: { type: Date },
-});
-
- */
 @Schema({ timestamps: true, expireAfterSeconds: 1000 })
 export class Otp {
   @Prop({

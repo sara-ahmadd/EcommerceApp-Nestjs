@@ -39,7 +39,7 @@ export class AuthGuard implements CanActivate {
       if (!user) throw new NotFoundException('user is not found');
       const request = ctx.getRequest();
       request.user = user;
-      console.log(user);
+
       return true;
     } catch (error) {
       throw new BadRequestException(error);
