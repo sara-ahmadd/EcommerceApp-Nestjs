@@ -11,7 +11,6 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './common/guards/authentication.guard';
 import { AuthorizationGuard } from './common/guards/authorization.guard';
 import { CategoryModule } from './modules/category/category.module';
-import { CategoryModule } from './modules/category/category.module';
 
 @Module({
   imports: [
