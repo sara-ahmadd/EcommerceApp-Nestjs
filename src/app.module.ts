@@ -44,11 +44,11 @@ import { CategoryModule } from './modules/category/category.module';
     AppService,
     {
       provide: APP_GUARD,
-      useClass: AuthGuard,
+      useClass: AuthGuard, //authentication guard
     },
     {
       provide: APP_GUARD,
-      useClass: AuthorizationGuard,
+      useClass: AuthorizationGuard, //authorization guard
     },
   ],
 })

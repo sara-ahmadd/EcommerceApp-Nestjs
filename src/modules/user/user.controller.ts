@@ -5,7 +5,7 @@ import { UserService } from './user.service';
 import { Types } from 'mongoose';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { UpdateUserDto } from './update-user.dto';
-import { Roles } from 'src/common/decorators/roles.decorator';
+import { Roles } from '././../../common/decorators/roles.decorator';
 import { UserRoles } from './create-user.dto';
 import { GetUsersDto } from './get-users.dto';
 
