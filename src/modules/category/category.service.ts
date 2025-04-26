@@ -21,7 +21,6 @@ import { CreateCategoryDto } from './dtos/create-category.dto';
 export class CategoryService {
   constructor(
     private _CategoryRepo: CategoryRepository,
-    @Inject(CloudinaryProviderName) private cloudinary: typeof Cloudinary,
     private _ConfigService: ConfigService,
     private _FileService: FileServices,
   ) {}
