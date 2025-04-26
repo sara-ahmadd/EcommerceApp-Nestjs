@@ -28,7 +28,15 @@ export abstract class AbstractDBRepository<TDoc> {
     return { data };
   }
 
-  async findOne({ filter = {}, populate = '', select = '' }) {
+  async findOne({
+    filter = {},
+    populate,
+    select,
+  }: {
+    filter: Partial<TDoc>;
+    populate?: any;
+    select?: string;
+  }) {
     let query = this.model.findOne(filter);
     if (populate) query = query.populate(populate);
     if (select) query = query.select(select);
@@ -38,7 +46,7 @@ export abstract class AbstractDBRepository<TDoc> {
   }
 
   async updateOne({ filter = {}, updatedFields = {} }) {
-    return this.model.findOneAndUpdate(filter, updatedFields);
+    return this.model.findOneAndUpdate(filter, updatedFields, { new: true });
   }
 
   async removeOne({ filter = {} }) {

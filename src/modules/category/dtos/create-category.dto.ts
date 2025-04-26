@@ -5,7 +5,4 @@ export class CreateCategoryDto {
   @IsString()
   @IsNotEmpty()
   name: string;
-
-  @IsNotEmpty()
-  image: IImage;
 }

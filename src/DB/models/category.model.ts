@@ -13,11 +13,18 @@ import { HydratedDocument } from 'mongoose';
 
 @Schema({ timestamps: true })
 export class Category {
-  @Prop({ type: String, unique: true })
+  @Prop({
+    type: String,
+    unique: true,
+    required: true,
+  })
   name: string;
 
   @Prop({ type: String, unique: true })
   slug: string;
+
+  @Prop({ type: String })
+  folder: string;
 
   @Prop(raw({ secure_url: String, public_id: String }))
   image: IImage;
@@ -35,7 +42,7 @@ export const CategoryModel = MongooseModule.forFeatureAsync([
     name: CategoryModelName,
     useFactory: () => {
       CategorySchema.pre('save', function (next) {
-        if (this.isModified(this.name)) {
+        if (this.isModified('name')) {
           this.slug = slugify(this.name);
         }
         next();
