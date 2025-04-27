@@ -1,21 +1,17 @@
 import {
   BadRequestException,
   ConflictException,
-  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Types } from 'mongoose';
+import { FileServices } from './../../common/fileUpload/fileUpload.service';
+import { IImage } from './../../common/types/image.type';
 import { CategoryDocument } from './../../DB/models/category.model';
 import { CategoryRepository } from './category.repository';
-import { Types } from 'mongoose';
-import { CloudinaryProviderName } from 'src/common/providers/cloudinary.provider';
-import { v2 as Cloudinary, UploadApiResponse } from 'cloudinary';
-import { ConfigService } from '@nestjs/config';
-import { IImage } from 'src/common/types/image.type';
 import { GetAllCategoriesDto } from './dtos/get-all-categories.dto';
-import { FileServices } from 'src/common/fileUpload/fileUpload.service';
 import { UpdateCategoryDto } from './dtos/update-category.dto';
-import { CreateCategoryDto } from './dtos/create-category.dto';
 
 @Injectable()
 export class CategoryService {

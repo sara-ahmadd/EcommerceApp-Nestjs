@@ -12,11 +12,11 @@ import {
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dtos/create-category.dto';
 import { Types } from 'mongoose';
-import { User } from 'src/common/decorators/user.decorator';
+import { User } from './../../common/decorators/user.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Roles } from 'src/common/decorators/roles.decorator';
+import { Roles } from './../../common/decorators/roles.decorator';
 import { UserRoles } from '../user/create-user.dto';
-import { Public } from 'src/common/decorators/public.decorator';
+import { Public } from './../../common/decorators/public.decorator';
 import { GetAllCategoriesDto } from './dtos/get-all-categories.dto';
 import { UpdateCategoryDto } from './dtos/update-category.dto';
 

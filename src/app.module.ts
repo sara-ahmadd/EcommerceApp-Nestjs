@@ -11,6 +11,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './common/guards/authentication.guard';
 import { AuthorizationGuard } from './common/guards/authorization.guard';
 import { CategoryModule } from './modules/category/category.module';
+import { SubCategoryModule } from './modules/sub-category/sub-category.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { CategoryModule } from './modules/category/category.module';
       }),
     }),
     CategoryModule,
+    SubCategoryModule,
   ],
   controllers: [AppController],
   providers: [

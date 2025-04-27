@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { FileModule } from 'src/common/fileUpload/file.module';
+import { FileModule } from './../../common/fileUpload/file.module';
 import { CategoryModel } from './../../DB/models/category.model';
 import { CategoryController } from './category.controller';
 import { CategoryRepository } from './category.repository';
