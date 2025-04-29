@@ -10,8 +10,8 @@ import { IImage } from './../../common/types/image.type';
 import { UserModelName } from './user.model';
 import slugify from 'slugify';
 import { HydratedDocument } from 'mongoose';
-import { FileServices } from 'src/common/fileUpload/fileUpload.service';
-import { FileModule } from 'src/common/fileUpload/file.module';
+import { FileServices } from './../../common/fileUpload/fileUpload.service';
+import { FileModule } from './../../common/fileUpload/file.module';
 
 @Schema({ timestamps: true })
 export class Category {
