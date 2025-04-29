@@ -26,4 +26,9 @@ export class FileServices {
         .end(file.buffer);
     });
   }
+  async deleteFolderWithItaAssets(folderPath: string) {
+    await this.cloudinary.api.delete_resources_by_prefix(folderPath);
+    const deletedFolder = await this.cloudinary.api.delete_folder(folderPath);
+    return deletedFolder.deleted;
+  }
 }

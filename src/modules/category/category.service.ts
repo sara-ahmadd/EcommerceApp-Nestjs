@@ -117,4 +117,14 @@ export class CategoryService {
     });
     return { message: 'Category updated successfully', updatedCategory };
   }
+
+  //delete category byid for admins
+  async deleteCategory(categoryId: Types.ObjectId) {
+    const category = await this._CategoryRepo.findOne({
+      filter: { _id: categoryId },
+    });
+    if (!category) throw new NotFoundException('Category is not found');
+    await category.deleteOne();
+    return { message: 'Category is deleted successfully.' };
+  }
 }

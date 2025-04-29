@@ -1,4 +1,4 @@
-import { Model } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 
 export abstract class AbstractDBRepository<TDoc> {
   constructor(private readonly model: Model<TDoc>) {}
@@ -8,12 +8,19 @@ export abstract class AbstractDBRepository<TDoc> {
   }
   //page & limit for paginate method
   async findAll({
-    filter = {},
-    populate = '',
-    select = '',
+    filter,
+    populate,
+    select,
     page = 1,
     limit = 5,
     sort = 0,
+  }: {
+    filter: FilterQuery<TDoc>;
+    populate?: any;
+    select?: string;
+    page?: number;
+    limit?: number;
+    sort?: number;
   }) {
     let query = this.model.find(filter);
     if (populate) query = query.populate(populate);

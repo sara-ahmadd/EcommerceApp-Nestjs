@@ -16,6 +16,7 @@ async function bootstrap() {
       transformOptions: {
         enableImplicitConversion: true, // <-- Enables @Type(() => Number)
       },
+      validationError: { target: false },
     }),
   );
   app.useGlobalInterceptors(

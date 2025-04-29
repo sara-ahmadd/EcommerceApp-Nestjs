@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -48,7 +49,7 @@ export class CategoryController {
     return this.categoryService.getCategoryBySlug(slug);
   }
 
-  //get category by slug
+  //update category by slug
   @Roles(UserRoles.admin)
   @UseInterceptors(FileInterceptor('image'))
   @Patch('/')
@@ -58,5 +59,11 @@ export class CategoryController {
     @UploadedFile() file: Express.Multer.File,
   ) {
     return this.categoryService.updateCategory(query, body, file);
+  }
+  //delete category by id
+  @Roles(UserRoles.admin)
+  @Delete('/:id')
+  deleteCategoryById(@Param('id') categoryId: Types.ObjectId) {
+    return this.categoryService.deleteCategory(categoryId);
   }
 }

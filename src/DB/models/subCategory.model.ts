@@ -12,9 +12,10 @@ import slugify from 'slugify';
 import { HydratedDocument } from 'mongoose';
 import { FileServices } from 'src/common/fileUpload/fileUpload.service';
 import { FileModule } from 'src/common/fileUpload/file.module';
+import { CategoryModelName } from './category.model';
 
 @Schema({ timestamps: true })
-export class Category {
+export class SubCategory {
   @Prop({
     type: String,
     unique: true,
@@ -33,24 +34,27 @@ export class Category {
 
   @Prop({ type: Types.ObjectId, ref: UserModelName })
   createdBy: Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, ref: CategoryModelName })
+  categoryId: Types.ObjectId;
 }
 
-const CategorySchema = SchemaFactory.createForClass(Category);
+const SubCategorySchema = SchemaFactory.createForClass(SubCategory);
 
-export const CategoryModelName = Category.name;
+export const SubCategoryModelName = SubCategory.name;
 
-export const CategoryModel = MongooseModule.forFeatureAsync([
+export const SubCategoryModel = MongooseModule.forFeatureAsync([
   {
-    name: CategoryModelName,
+    name: SubCategoryModelName,
     imports: [FileModule],
     useFactory: (fileServices: FileServices) => {
-      CategorySchema.pre('save', function (next) {
+      SubCategorySchema.pre('save', function (next) {
         if (this.isModified('name')) {
           this.slug = slugify(this.name);
         }
         next();
       });
-      CategorySchema.post(
+      SubCategorySchema.post(
         'deleteOne',
         { document: true, query: false },
         async function (doc, next) {
@@ -58,11 +62,11 @@ export const CategoryModel = MongooseModule.forFeatureAsync([
           next();
         },
       );
-      return CategorySchema;
+      return SubCategorySchema;
     },
     inject: [FileServices],
   },
 ]);
 
-//export type of category document
-export type CategoryDocument = HydratedDocument<Category>;
+//export type of SubCategory document
+export type SubCategoryDocument = HydratedDocument<SubCategory>;
