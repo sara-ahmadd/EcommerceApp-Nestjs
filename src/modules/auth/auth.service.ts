@@ -5,7 +5,7 @@ import { otpTypes } from '../../DB/models/user.model';
 import { resetPasswordTemplate } from '../../utils/emails/resetPassword';
 import { compareHash, hashText } from '../../utils/hashText';
 import { generateToken, verifyToken } from '../../utils/token';
-import { CreateUserDto } from '../user/create-user.dto';
+import { CreateUserDto } from '../user/dtos/create-user.dto';
 import { UserRepository } from '../user/user.repository';
 import { UserService } from '../user/user.service';
 import {
@@ -13,7 +13,7 @@ import {
   LoginDto,
   ResetPasswordDto,
   VerifyEmailDto,
-} from './auth.dto';
+} from './dtos/auth.dto';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()

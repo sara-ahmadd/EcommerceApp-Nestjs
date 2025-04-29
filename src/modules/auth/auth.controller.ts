@@ -1,12 +1,12 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { Public } from './../../common/decorators/public.decorator';
-import { CreateUserDto } from '../user/create-user.dto';
+import { CreateUserDto } from '../user/dtos/create-user.dto';
 import {
   ForgotPasswordDto,
   LoginDto,
   ResetPasswordDto,
   VerifyEmailDto,
-} from './auth.dto';
+} from './dtos/auth.dto';
 import { AuthService } from './auth.service';
 
 @Public()

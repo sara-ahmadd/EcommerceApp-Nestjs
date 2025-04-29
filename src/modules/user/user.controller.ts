@@ -4,10 +4,10 @@ import { UserDocument } from './../../DB/models/user.model';
 import { UserService } from './user.service';
 import { Types } from 'mongoose';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
-import { UpdateUserDto } from './update-user.dto';
+import { UpdateUserDto } from './dtos/update-user.dto';
 import { Roles } from '././../../common/decorators/roles.decorator';
-import { UserRoles } from './create-user.dto';
-import { GetUsersDto } from './get-users.dto';
+import { UserRoles } from './dtos/create-user.dto';
+import { GetUsersDto } from './dtos/get-users.dto';
 
 @Controller('/user')
 export class UserController {

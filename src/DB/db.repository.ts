@@ -13,14 +13,14 @@ export abstract class AbstractDBRepository<TDoc> {
     select,
     page = 1,
     limit = 5,
-    sort = 0,
+    sort = 1,
   }: {
     filter: FilterQuery<TDoc>;
     populate?: any;
     select?: string;
     page?: number;
     limit?: number;
-    sort?: number;
+    sort?: 1 | -1;
   }) {
     let query = this.model.find(filter);
     if (populate) query = query.populate(populate);
@@ -30,6 +30,7 @@ export abstract class AbstractDBRepository<TDoc> {
       return paginationResult;
     }
     if (select) query = query.select(select);
+    if (sort) query = query.sort({ createdAt: sort });
 
     const data = await query.exec();
     return { data };

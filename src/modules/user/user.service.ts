@@ -9,10 +9,10 @@ import * as otpGenerator from 'otp-generator';
 import { otpTypes, UserDocument } from '../../DB/models/user.model';
 import { decrypt } from '../../utils/encryptText';
 import { emailVerificationTemplate } from '../../utils/emails/emailVerification';
-import { CreateUserDto } from './create-user.dto';
+import { CreateUserDto } from './dtos/create-user.dto';
 import { UserRepository } from './user.repository';
 import { Types } from 'mongoose';
-import { GetUsersDto } from './get-users.dto';
+import { GetUsersDto } from './dtos/get-users.dto';
 
 @Injectable()
 export class UserService {

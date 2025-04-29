@@ -22,7 +22,8 @@ export class ErrorHandlerInterceptor implements NestInterceptor {
             : HttpStatus.INTERNAL_SERVER_ERROR;
         const errObj = {
           status: 'Error',
-          error: error.message,
+          // error: error.message,
+          error,
           stack: error.stack,
         };
         return throwError(() => new HttpException(errObj, status));

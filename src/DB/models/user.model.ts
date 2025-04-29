@@ -2,7 +2,7 @@
 
 import { MongooseModule, Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { UserRoles } from './../../modules/user/create-user.dto';
+import { UserRoles } from '../../modules/user/dtos/create-user.dto';
 import { encryptText } from './../../utils/encryptText';
 import { hashText } from './../../utils/hashText';
 

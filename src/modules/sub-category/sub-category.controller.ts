@@ -16,10 +16,11 @@ import { Types } from 'mongoose';
 import { User } from './../../common/decorators/user.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Roles } from './../../common/decorators/roles.decorator';
-import { UserRoles } from '../user/create-user.dto';
+import { UserRoles } from '../user/dtos/create-user.dto';
 import { Public } from './../../common/decorators/public.decorator';
 import { GetAllSubCategoriesDto } from './dtos/get-all-subCategories.dto';
 import { UpdateSubCategoryDto } from './dtos/update-subCategory.dto';
+import { CheckFilePipe } from './../../common/pipes/validateFile.pipe';
 
 @Controller('sub_category')
 export class SubCategoryController {
@@ -29,7 +30,7 @@ export class SubCategoryController {
   @UseInterceptors(FileInterceptor('image'))
   @Post('/create')
   createSubCategory(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile(CheckFilePipe) file: Express.Multer.File,
     @Body() body: CreateSubCategoryDto,
     @User('_id') userId: Types.ObjectId,
   ) {

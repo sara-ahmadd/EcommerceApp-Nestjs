@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import './utils/mongoos-pginate';
-import { ValidationPipe } from '@nestjs/common';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { ErrorHandlerInterceptor } from './common/interceptors/errorHandling.interceptor';
 
@@ -12,11 +12,22 @@ async function bootstrap() {
     new ValidationPipe({
       whitelist: true,
       forbidNonWhitelisted: true,
-      transform: true, // <-- This is crucial!
+      transform: true,
       transformOptions: {
         enableImplicitConversion: true, // <-- Enables @Type(() => Number)
       },
-      validationError: { target: false },
+      //to get custom error msgs added in class-validator
+      exceptionFactory: (errors) => {
+        const messages = errors.map((err) => ({
+          field: err.property,
+          errors: Object.values(err.constraints || {}),
+        }));
+
+        return new BadRequestException({
+          status: 'Validation Failed',
+          message: messages,
+        });
+      },
     }),
   );
   app.useGlobalInterceptors(

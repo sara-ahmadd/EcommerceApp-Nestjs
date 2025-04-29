@@ -16,10 +16,11 @@ import { Types } from 'mongoose';
 import { User } from './../../common/decorators/user.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Roles } from './../../common/decorators/roles.decorator';
-import { UserRoles } from '../user/create-user.dto';
+import { UserRoles } from '../user/dtos/create-user.dto';
 import { Public } from './../../common/decorators/public.decorator';
 import { GetAllCategoriesDto } from './dtos/get-all-categories.dto';
 import { UpdateCategoryDto } from './dtos/update-category.dto';
+import { CheckFilePipe } from './../../common/pipes/validateFile.pipe';
 
 @Controller('category')
 export class CategoryController {
@@ -29,7 +30,7 @@ export class CategoryController {
   @UseInterceptors(FileInterceptor('image'))
   @Post('/create')
   createCategory(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile(CheckFilePipe) file: Express.Multer.File,
     @Body() body: CreateCategoryDto,
     @User('_id') userId: Types.ObjectId,
   ) {
@@ -56,7 +57,7 @@ export class CategoryController {
   updateCategoryBySlug(
     @Query() query: UpdateCategoryDto,
     @Body() body: UpdateCategoryDto,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile(CheckFilePipe) file: Express.Multer.File,
   ) {
     return this.categoryService.updateCategory(query, body, file);
   }

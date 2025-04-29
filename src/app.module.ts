@@ -12,6 +12,8 @@ import { AuthGuard } from './common/guards/authentication.guard';
 import { AuthorizationGuard } from './common/guards/authorization.guard';
 import { CategoryModule } from './modules/category/category.module';
 import { SubCategoryModule } from './modules/sub-category/sub-category.module';
+import { BrandModule } from './modules/brand/brand.module';
+import { ProductModule } from './modules/product/product.module';
 
 @Module({
   imports: [
@@ -40,6 +42,8 @@ import { SubCategoryModule } from './modules/sub-category/sub-category.module';
     }),
     CategoryModule,
     SubCategoryModule,
+    BrandModule,
+    ProductModule,
   ],
   controllers: [AppController],
   providers: [
