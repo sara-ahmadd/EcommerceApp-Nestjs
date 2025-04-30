@@ -50,7 +50,7 @@ export class SubCategoryService {
     const SubCategory = await this._SubCategoryRepo.create({
       data: {
         name: body.name,
-        categoryId: new Types.ObjectId(body.categoryId),
+        category: new Types.ObjectId(body.categoryId),
         createdBy: userId,
         image,
         folder: imageFolderPath,
@@ -65,7 +65,7 @@ export class SubCategoryService {
       page: query.page ?? 1,
       populate: [
         { path: 'createdBy', select: 'name email' },
-        { path: 'categoryId', select: 'name image' },
+        { path: 'category', select: 'name image' },
       ],
     });
     return { message: 'All SubCategories fetched successfully', ...data };
@@ -76,7 +76,7 @@ export class SubCategoryService {
       filter: { slug },
       populate: [
         { path: 'createdBy', select: 'name email' },
-        { path: 'categoryId', select: 'name image' },
+        { path: 'category', select: 'name image' },
       ],
     });
     if (!SubCategory) throw new NotFoundException('SubCategory is not found');
@@ -87,7 +87,7 @@ export class SubCategoryService {
         image: SubCategory.image,
         slug: SubCategory.slug,
         createdBy: SubCategory.createdBy,
-        category: SubCategory.categoryId,
+        category: SubCategory.category,
       },
     };
   }

@@ -36,7 +36,7 @@ export class SubCategory {
   createdBy: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: CategoryModelName })
-  categoryId: Types.ObjectId;
+  category: Types.ObjectId;
 }
 
 const SubCategorySchema = SchemaFactory.createForClass(SubCategory);
