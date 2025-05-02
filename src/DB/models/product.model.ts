@@ -12,6 +12,10 @@ import { CategoryModelName } from './category.model';
 import { SubCategoryModelName } from './subCategory.model';
 import { BrandModelName } from './brand.model';
 import slugify from 'slugify';
+import { FileServices } from './../../common/fileUpload/fileUpload.service';
+import { FileModule } from './../../common/fileUpload/file.module';
+
+export const maxProductImagesLength = 4;
 
 @Schema({ timestamps: true })
 export class Product {
@@ -71,9 +75,19 @@ export const ProductModelName = Product.name;
 export const ProductModel = MongooseModule.forFeatureAsync([
   {
     name: ProductModelName,
-    useFactory: () => {
+    useFactory: (_FileService: FileServices) => {
+      ProductSchema.post(
+        'deleteOne',
+        { document: true, query: false },
+        async function (doc, next) {
+          await _FileService.deleteFolderWithItaAssets(doc.folder);
+          next();
+        },
+      );
       return ProductSchema;
     },
+    inject: [FileServices],
+    imports: [FileModule],
   },
 ]);
 

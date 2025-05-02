@@ -15,6 +15,11 @@ import { IImage } from './../../common/types/image.type';
 import { CreateProductDto } from './dtos/create-product-dto';
 import { GetSingleProductDto } from './dtos/get-product.dto';
 import { ProductRepo } from './product.repository';
+import { IFiles } from './product.controller';
+import { UpdateProdDto } from './dtos/update-prod.dto';
+import { maxProductImagesLength } from './../../DB/models/product.model';
+import { User, UserDocument } from './../../DB/models/user.model';
+import { DeleteProdImageDto } from './dtos/delete-img.dto';
 
 @Injectable()
 export class ProductService {
@@ -31,9 +36,9 @@ export class ProductService {
   async createProduct(
     body: CreateProductDto,
     userId: Types.ObjectId,
-    files: { thumbnail: Express.Multer.File[]; images: Express.Multer.File[] },
+    files: IFiles,
   ) {
-    const { name, price, stock, description, category, subcategory, brand } =
+    const { name, price, stock, description, category, sub_category, brand } =
       body;
 
     //check : category, subcategory, brand
@@ -45,11 +50,11 @@ export class ProductService {
         `Category with this id ${category} is not found`,
       );
     const checkSubCategory = await this._SubCategoryRepo.findOne({
-      filter: { _id: new Types.ObjectId(subcategory) },
+      filter: { _id: new Types.ObjectId(sub_category) },
     });
     if (!checkSubCategory)
       throw new NotFoundException(
-        `Subcategory with this id ${subcategory} is not found`,
+        `Subcategory with this id ${sub_category} is not found`,
       );
     const checkBrand = await this._BrandRepo.findOne({
       filter: { _id: new Types.ObjectId(brand) },
@@ -97,10 +102,11 @@ export class ProductService {
         stock,
         createdBy: userId,
         category: new Types.ObjectId(category),
-        sub_category: new Types.ObjectId(subcategory),
+        sub_category: new Types.ObjectId(sub_category),
         brand: new Types.ObjectId(brand),
         thumbnail,
         images,
+        folder,
       },
     });
 
@@ -151,5 +157,143 @@ export class ProductService {
       page: params.page ?? 1,
     });
     return { message: 'products are fetched successfully', products };
+  }
+
+  //update product by id
+  async updateProduct(
+    body: UpdateProdDto,
+    productId: Types.ObjectId,
+    files: IFiles,
+    user: Partial<UserDocument>,
+  ) {
+    const { name, description, stock, price, category, sub_category, brand } =
+      body;
+
+    const product = await this._ProductRepo.findOne({
+      filter: { _id: productId, createdBy: user._id },
+    });
+    if (!product) {
+      throw new NotFoundException(
+        `product with this name : ${name} & created by : ${user.email} is not found`,
+      );
+    }
+
+    let thubmnail: IImage | undefined;
+    if (files && files.thumbnail && files.thumbnail.length > 0) {
+      const { secure_url, public_id } = await this._FileService.uploadFile(
+        {
+          public_id: product.thumbnail.public_id,
+        },
+        files.thumbnail[0],
+      );
+      thubmnail = { secure_url, public_id };
+    }
+
+    let newImages: IImage[] = [];
+
+    //check the available number of images in the product
+    const imgsLength = product.images.length || 0;
+
+    if (files && files.images) {
+      if (files.images.length > maxProductImagesLength - imgsLength) {
+        throw new BadRequestException(
+          'This exceeds maximum number of images permited for each product, delete some of current images first',
+        );
+      } else {
+        for (const image of files.images) {
+          const { secure_url, public_id } = await this._FileService.uploadFile(
+            { folder: product.folder },
+            image,
+          );
+          newImages.push({ secure_url, public_id });
+        }
+      }
+    }
+    const updatedProduct = await this._ProductRepo.updateOne({
+      filter: { _id: productId },
+      updatedFields: {
+        name: name ? name : product.name,
+        description: description ? description : product.description,
+        stock: stock ? stock : product.stock,
+        price: price ? price : product.price,
+        category: category ? category : product.category,
+        sub_category: sub_category ? sub_category : product.sub_category,
+        brand: brand ? brand : product.brand,
+        thubmnail: thubmnail ? thubmnail : product.thumbnail,
+        images: newImages.length
+          ? [...product.images, ...newImages]
+          : product.images,
+      },
+    });
+
+    return { message: 'Product is updated successfully', updatedProduct };
+  }
+
+  //delete image from product
+  async deleteImageProd(
+    body: DeleteProdImageDto,
+    productId: Types.ObjectId,
+
+    user: Partial<UserDocument>,
+  ) {
+    const { image } = body;
+    const product = await this._ProductRepo.findOne({
+      filter: {
+        _id: productId,
+        createdBy: user._id,
+        $or: [
+          { 'thumbnail.public_id': image.public_id },
+          { 'images.public_id': image.public_id },
+        ],
+      },
+    });
+
+    if (!product) {
+      throw new NotFoundException(
+        `product is not found or this image does not belong to it`,
+      );
+    }
+
+    if (image.public_id === product.thumbnail.public_id) {
+      if (product.images.length > 0) {
+        //replace thumbnail with the first image of product images
+        product.thumbnail = product.images[0];
+        //remove thumbnail image from images
+        product.images.shift();
+        //delete old thumbnail from cloudinary
+        const deleteedImg = await this._FileService.deleteFile(image.public_id);
+        console.log(deleteedImg);
+        await product.save();
+      } else {
+        throw new BadRequestException(
+          'there must be images available in the product to be able to delete thumbnail image',
+        );
+      }
+    } else {
+      const updatedImages = product.images.filter(
+        (img) => img.public_id !== image.public_id,
+      );
+      product.images = updatedImages;
+      await product.save();
+      //delete old thumbnail from cloudinary
+      const deleteedImg = await this._FileService.deleteFile(image.public_id);
+      console.log(deleteedImg);
+    }
+    return { message: 'Image is deleted successfully' };
+  }
+
+  //delete product by id
+  async deleteProduct(productId: Types.ObjectId, user: Partial<UserDocument>) {
+    const product = await this._ProductRepo.findOne({
+      filter: { _id: productId, createdBy: user._id },
+    });
+    if (!product) {
+      throw new NotFoundException(
+        `product with this id : ${productId} & created by : ${user.email} is not found`,
+      );
+    }
+
+    await product.deleteOne();
+    return { message: 'Product is deleted successfully' };
   }
 }

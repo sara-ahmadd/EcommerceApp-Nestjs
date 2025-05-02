@@ -33,7 +33,7 @@ export class AuthGuard implements CanActivate {
       // console.log(token);
       if (!token) throw new BadRequestException('token is required');
       const payload = verifyToken(token!);
-      const user = await this._userService.getUer({
+      const user = await this._userService.getUser({
         filter: { _id: payload.id },
       });
       if (!user) throw new NotFoundException('user is not found');

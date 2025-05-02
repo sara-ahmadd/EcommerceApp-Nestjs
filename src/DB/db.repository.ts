@@ -41,7 +41,7 @@ export abstract class AbstractDBRepository<TDoc> {
     populate,
     select,
   }: {
-    filter: Partial<TDoc>;
+    filter: FilterQuery<TDoc>;
     populate?: any;
     select?: string;
   }) {
@@ -54,7 +54,10 @@ export abstract class AbstractDBRepository<TDoc> {
   }
 
   async updateOne({ filter = {}, updatedFields = {} }) {
-    return this.model.findOneAndUpdate(filter, updatedFields, { new: true });
+    return this.model.findOneAndUpdate(filter, updatedFields, {
+      new: true,
+      runValidators: true,
+    });
   }
 
   async removeOne({ filter = {} }) {

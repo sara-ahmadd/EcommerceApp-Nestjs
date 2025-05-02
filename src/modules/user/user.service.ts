@@ -11,7 +11,7 @@ import { decrypt } from '../../utils/encryptText';
 import { emailVerificationTemplate } from '../../utils/emails/emailVerification';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UserRepository } from './user.repository';
-import { Types } from 'mongoose';
+import { FilterQuery, Types } from 'mongoose';
 import { GetUsersDto } from './dtos/get-users.dto';
 
 @Injectable()
@@ -64,8 +64,10 @@ export class UserService {
     }
   }
 
-  async getUer({ filter }: { filter: Partial<UserDocument> }) {
-    const user = this._UserRepo.findOne({ filter });
+  async getUser({ filter }: { filter: Partial<UserDocument> }) {
+    const user = this._UserRepo.findOne({
+      filter: filter as FilterQuery<UserDocument>,
+    });
     if (!user) throw new NotFoundException('user is not found');
     return user;
   }

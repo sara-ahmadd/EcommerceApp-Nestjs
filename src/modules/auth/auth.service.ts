@@ -48,7 +48,7 @@ export class AuthService {
   }
 
   async login(body: LoginDto) {
-    const user = await this._UserService.getUer({
+    const user = await this._UserService.getUser({
       filter: { email: body.email },
     });
     if (!user) throw new BadRequestException('user is not found');
@@ -129,7 +129,7 @@ export class AuthService {
 
   async generateAccessToken(refreshToken: string) {
     const payload = verifyToken(refreshToken);
-    const user = await this._UserService.getUer({
+    const user = await this._UserService.getUser({
       filter: { _id: payload.id },
     });
     if (!user) throw new BadRequestException('user is not found');

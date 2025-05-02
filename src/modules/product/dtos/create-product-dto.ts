@@ -19,7 +19,7 @@ export class CreateProductDto {
   @IsNotEmpty()
   category: string;
   @IsMongoId()
-  subcategory?: string;
+  sub_category?: string;
   @IsMongoId()
   @IsNotEmpty()
   brand: string;
