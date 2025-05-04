@@ -58,8 +58,8 @@ export class Product {
   @Prop({ type: Types.ObjectId, ref: CategoryModelName })
   category: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: SubCategoryModelName })
-  sub_category: Types.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: SubCategoryModelName, required: false })
+  sub_category: Types.ObjectId | string;
 
   @Prop({ type: Types.ObjectId, ref: BrandModelName })
   brand: Types.ObjectId;

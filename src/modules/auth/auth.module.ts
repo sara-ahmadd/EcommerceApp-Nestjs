@@ -4,10 +4,12 @@ import { AuthController } from './auth.controller';
 import { UserService } from '../user/user.service';
 import { UserRepository } from '../user/user.repository';
 import { UserModel } from './../../DB/models/user.model';
+import { CartService } from '../cart/cart.service';
+import { CartModule } from '../cart/cart.module';
 
 @Module({
-  imports: [UserModel],
+  imports: [UserModel, CartModule],
   controllers: [AuthController],
-  providers: [AuthService, UserService, UserRepository],
+  providers: [AuthService, UserService, UserRepository, CartService],
 })
 export class AuthModule {}

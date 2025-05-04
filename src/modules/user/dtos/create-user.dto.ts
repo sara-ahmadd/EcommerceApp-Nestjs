@@ -1,7 +1,9 @@
 import {
   IsEmail,
+  IsEnum,
   IsIn,
   IsNotEmpty,
+  IsOptional,
   IsString,
   ValidateIf,
 } from 'class-validator';
@@ -37,4 +39,8 @@ export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
   address: string;
+
+  @IsEnum(UserRoles)
+  @IsOptional()
+  role: string;
 }

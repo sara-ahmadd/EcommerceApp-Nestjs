@@ -16,11 +16,14 @@ import {
 } from './dtos/auth.dto';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
+import { CartService } from '../cart/cart.service';
+
 @Injectable()
 export class AuthService {
   constructor(
     private _UserService: UserService,
     private _UserRepo: UserRepository,
+    private _CartService: CartService,
     private configService: ConfigService,
     private mailerService: MailerService,
   ) {}
@@ -41,6 +44,8 @@ export class AuthService {
 
     user.isVerified = true;
     await user.save();
+    //create cart for verified user
+    await this._CartService.createCart(user._id);
     return {
       status: 'success',
       message: 'email is verified successfully',
@@ -141,7 +146,7 @@ export class AuthService {
     return { accessToken };
   }
 
-  @Cron(CronExpression.EVERY_2_HOURS)
+  @Cron(CronExpression.EVERY_6_HOURS)
   async removeExpiredOtps() {
     const currentTime = new Date();
 

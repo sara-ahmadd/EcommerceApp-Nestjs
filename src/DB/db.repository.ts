@@ -1,4 +1,4 @@
-import { FilterQuery, Model } from 'mongoose';
+import { FilterQuery, Model, UpdateQuery } from 'mongoose';
 
 export abstract class AbstractDBRepository<TDoc> {
   constructor(private readonly model: Model<TDoc>) {}
@@ -53,7 +53,13 @@ export abstract class AbstractDBRepository<TDoc> {
     return data;
   }
 
-  async updateOne({ filter = {}, updatedFields = {} }) {
+  async updateOne({
+    filter = {},
+    updatedFields = {},
+  }: {
+    filter: FilterQuery<TDoc>;
+    updatedFields: UpdateQuery<TDoc>;
+  }) {
     return this.model.findOneAndUpdate(filter, updatedFields, {
       new: true,
       runValidators: true,

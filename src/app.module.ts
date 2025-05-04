@@ -14,6 +14,9 @@ import { CategoryModule } from './modules/category/category.module';
 import { SubCategoryModule } from './modules/sub-category/sub-category.module';
 import { BrandModule } from './modules/brand/brand.module';
 import { ProductModule } from './modules/product/product.module';
+import { CartModule } from './modules/cart/cart.module';
+import { ReviewModule } from './modules/review/review.module';
+import { OrderModule } from './modules/order/order.module';
 
 @Module({
   imports: [
@@ -44,6 +47,9 @@ import { ProductModule } from './modules/product/product.module';
     SubCategoryModule,
     BrandModule,
     ProductModule,
+    CartModule,
+    ReviewModule,
+    OrderModule,
   ],
   controllers: [AppController],
   providers: [

@@ -49,13 +49,15 @@ export class ProductService {
       throw new NotFoundException(
         `Category with this id ${category} is not found`,
       );
-    const checkSubCategory = await this._SubCategoryRepo.findOne({
-      filter: { _id: new Types.ObjectId(sub_category) },
-    });
-    if (!checkSubCategory)
-      throw new NotFoundException(
-        `Subcategory with this id ${sub_category} is not found`,
-      );
+    if (sub_category) {
+      const checkSubCategory = await this._SubCategoryRepo.findOne({
+        filter: { _id: new Types.ObjectId(sub_category) },
+      });
+      if (!checkSubCategory)
+        throw new NotFoundException(
+          `Subcategory with this id ${sub_category} is not found`,
+        );
+    }
     const checkBrand = await this._BrandRepo.findOne({
       filter: { _id: new Types.ObjectId(brand) },
     });
@@ -102,7 +104,7 @@ export class ProductService {
         stock,
         createdBy: userId,
         category: new Types.ObjectId(category),
-        sub_category: new Types.ObjectId(sub_category),
+        sub_category: sub_category ? new Types.ObjectId(sub_category) : '',
         brand: new Types.ObjectId(brand),
         thumbnail,
         images,
