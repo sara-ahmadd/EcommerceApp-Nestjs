@@ -17,6 +17,8 @@ import { ProductModule } from './modules/product/product.module';
 import { CartModule } from './modules/cart/cart.module';
 import { ReviewModule } from './modules/review/review.module';
 import { OrderModule } from './modules/order/order.module';
+import { CouponModule } from './modules/coupon/coupon.module';
+import { SocketModule } from './modules/socket/socket.module';
 
 @Module({
   imports: [
@@ -50,6 +52,7 @@ import { OrderModule } from './modules/order/order.module';
     CartModule,
     ReviewModule,
     OrderModule,
+    CouponModule,
   ],
   controllers: [AppController],
   providers: [

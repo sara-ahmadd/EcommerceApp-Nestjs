@@ -1,9 +1,27 @@
 import { Module } from '@nestjs/common';
-import { OrderService } from './order.service';
+import { OrderModel } from './../../DB/models/order.model';
+import { BrandModule } from '../brand/brand.module';
+import { CartModule } from '../cart/cart.module';
+import { CategoryModule } from '../category/category.module';
+import { CouponModule } from '../coupon/coupon.module';
+import { ProductModule } from '../product/product.module';
+import { SubCategoryModule } from '../sub-category/sub-category.module';
 import { OrderController } from './order.controller';
+import { OrderRepo } from './order.repository';
+import { OrderService } from './order.service';
 
 @Module({
+  imports: [
+    CouponModule,
+    OrderModel,
+    CategoryModule,
+    SubCategoryModule,
+    BrandModule,
+    ProductModule,
+    CartModule,
+  ],
   controllers: [OrderController],
-  providers: [OrderService],
+  providers: [OrderService, OrderRepo],
+  exports: [OrderRepo],
 })
 export class OrderModule {}

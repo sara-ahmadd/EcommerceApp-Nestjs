@@ -8,6 +8,6 @@ import { CartModel } from './../../DB/models/cart.model';
   imports: [CartModel],
   controllers: [CartController],
   providers: [CartService, CartRepo],
-  exports: [CartRepo],
+  exports: [CartRepo, CartService],
 })
 export class CartModule {}

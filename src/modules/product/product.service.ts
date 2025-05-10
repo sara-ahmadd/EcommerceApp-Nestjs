@@ -20,6 +20,7 @@ import { UpdateProdDto } from './dtos/update-prod.dto';
 import { maxProductImagesLength } from './../../DB/models/product.model';
 import { User, UserDocument } from './../../DB/models/user.model';
 import { DeleteProdImageDto } from './dtos/delete-img.dto';
+import { StockGateway } from '../socket/stock.gateway';
 
 @Injectable()
 export class ProductService {
@@ -30,6 +31,7 @@ export class ProductService {
     private _ProductRepo: ProductRepo,
     private _ConfigService: ConfigService,
     private _FileService: FileServices,
+    private _StockGateway: StockGateway,
   ) {}
 
   //create product
@@ -104,7 +106,7 @@ export class ProductService {
         stock,
         createdBy: userId,
         category: new Types.ObjectId(category),
-        sub_category: sub_category ? new Types.ObjectId(sub_category) : '',
+        ...(sub_category && { sub_category: new Types.ObjectId(sub_category) }),
         brand: new Types.ObjectId(brand),
         thumbnail,
         images,
@@ -153,7 +155,7 @@ export class ProductService {
       populate: [
         { path: 'createdBy', select: 'name email' },
         { path: 'category', select: 'image name slug' },
-        { path: 'sub_category', select: 'image name slug categoryId' },
+        { path: 'sub_category', select: 'image name slug category' },
         { path: 'brand', select: 'logo name slug' },
       ],
       page: params.page ?? 1,
@@ -297,5 +299,22 @@ export class ProductService {
 
     await product.deleteOne();
     return { message: 'Product is deleted successfully' };
+  }
+
+  async updateProductStock(
+    productId: Types.ObjectId,
+    quantitiy: number,
+    increment: boolean,
+  ) {
+    const product = await this._ProductRepo.updateOne({
+      filter: { _id: productId },
+      updatedFields: {
+        $inc: { stock: increment ? quantitiy : -quantitiy },
+      },
+    });
+    //socketio : realtime stock update
+    await this._StockGateway.broadCastUpdateStock(product!._id, product!.stock);
+
+    return product;
   }
 }

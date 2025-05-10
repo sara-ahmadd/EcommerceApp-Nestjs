@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Types } from 'mongoose';
 import { UserDocument } from './../../DB/models/user.model';
+import { CartWithPopulatedProducts } from './../../common/types/populatedProduct.type';
 import { CartRepo } from './cart.repository';
 import { AddProductDto } from './dtos/add-product.dto';
 
@@ -13,8 +14,10 @@ export class CartService {
     });
   }
 
-  async getCart(userId: Types.ObjectId) {
-    const cart = await this._CartRepo.findOne({
+  async getCart(
+    userId: Types.ObjectId,
+  ): Promise<{ message: string; cart: CartWithPopulatedProducts }> {
+    const cart = (await this._CartRepo.findOne({
       filter: { user: userId },
       populate: {
         path: 'products.product',
@@ -23,7 +26,10 @@ export class CartService {
           { path: 'brand', select: 'name logo' },
         ],
       },
-    });
+    })) as unknown as CartWithPopulatedProducts;
+    if (!cart) {
+      throw new NotFoundException('Cart not found for the given user');
+    }
     return { message: 'Cart is fetched successfully', cart };
   }
 

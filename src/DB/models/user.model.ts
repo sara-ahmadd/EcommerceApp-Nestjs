@@ -57,7 +57,7 @@ export class User {
 }
 
 //schema
-const UserSchema = SchemaFactory.createForClass(User);
+export const UserSchema = SchemaFactory.createForClass(User);
 
 //hash password before creating new user document
 UserSchema.pre('save', function (next) {
