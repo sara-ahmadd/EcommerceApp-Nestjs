@@ -84,7 +84,7 @@ export class Product {
   discount: { amount: number; isPercentage: boolean };
 
   @Prop({ type: Number })
-  finalPrice: Number;
+  finalPrice: number;
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);

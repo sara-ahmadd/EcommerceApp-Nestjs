@@ -23,7 +23,9 @@ export class PaymentService {
     });
   }
 
-  async CreateCoupon(percent_off: number) {
+  async CreateCoupon(
+    percent_off: number,
+  ): Promise<Stripe.Response<Stripe.Coupon>> {
     return await this.stripe.coupons.create({
       currency: 'egp',
       percent_off,

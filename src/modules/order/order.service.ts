@@ -12,6 +12,7 @@ import { ProductService } from '../product/product.service';
 import { PaymentMethods } from './../../common/types/paymentMethods.type';
 import { PaymentService } from '../payment/payment.service';
 import { IStripeLineItems } from './../../common/types/stripeLineItems.type';
+import { CouponDocument } from './../../DB/models/coupon.model';
 
 @Injectable()
 export class OrderService {
@@ -24,11 +25,21 @@ export class OrderService {
   ) {}
   async createOrder(userId: Types.ObjectId, body: CreateOrderDto) {
     const { paymentMethod, coupon } = body;
-    let getCoupon: any;
+    let getCoupon:
+      | {
+          message: string;
+          coupon: Partial<CouponDocument>;
+        }
+      | undefined = undefined as
+      | {
+          message: string;
+          coupon: Partial<CouponDocument>;
+        }
+      | undefined;
     if (coupon) {
       getCoupon = await this._CouponService.getCouponByCode(coupon);
       if (!getCoupon) {
-        throw new NotFoundException('coupo is not found');
+        throw new NotFoundException('coupon is not found');
       }
     }
 
@@ -60,27 +71,35 @@ export class OrderService {
     const line_items: IStripeLineItems[] = [];
 
     for (const product of userCart.cart?.products) {
-      totalCost += Number(product.product.finalPrice) * product.quantity;
+      totalCost +=
+        (product.product.finalPrice || product.product.price) *
+        product.quantity;
       totalAmount += product.quantity;
 
       cart.push({
         product: product.product._id,
         quantity: product.quantity,
-        price: Number(product.product.finalPrice) * product.quantity,
+        price:
+          (product.product.finalPrice || product.product.price) *
+          product.quantity,
       });
 
       line_items.push({
-        product_data: {
-          name: product.product.name,
-          images: [...product.product.images.map((img) => img.secure_url)],
-          unit_amount: Number(product.product.finalPrice),
+        price_data: {
+          currency: 'egp',
+          unit_amount:
+            (product.product.finalPrice || product.product.price) * 100,
+          product_data: {
+            name: product.product.name,
+            images: [...product.product.images.map((img) => img.secure_url)],
+          },
         },
         quantity: product.quantity,
       });
     }
 
     const couponDiscount = getCoupon?.coupon.discount;
-    const isPercent = getCoupon?.coupon.isPercentage;
+    const isPercent = getCoupon?.coupon?.isPercentage;
     //create order
     const order = await this._OrderRepo.create({
       data: {
@@ -89,12 +108,12 @@ export class OrderService {
         totaQuantity: totalAmount,
         totalCost,
         ...(paymentMethod && { paymentMethod: paymentMethod }),
-        ...(coupon && { coupon: getCoupon.coupon._id }),
+        ...(coupon && { coupon: getCoupon?.coupon._id }),
         finalPrice:
           coupon && getCoupon
             ? isPercent
-              ? totalCost - (totalCost * couponDiscount) / 100
-              : totalCost - couponDiscount
+              ? totalCost - (totalCost * (couponDiscount || 0)) / 100
+              : totalCost - (couponDiscount || 0)
             : totalCost,
       },
     });
@@ -116,7 +135,11 @@ export class OrderService {
         order,
       };
     }
-    const session = await this.CardPayment(line_items, order.id);
+    const session = await this.CardPayment({
+      line_items,
+      orderId: order.id,
+      ...(coupon && { coupon: couponDiscount }),
+    });
     return {
       message: 'Order is created successfully',
       session: session.url,
@@ -124,12 +147,17 @@ export class OrderService {
     };
   }
 
-  async CardPayment(
-    line_items: IStripeLineItems[],
-    orderId: string,
-    customer_email?: string,
-    coupon?: number,
-  ) {
+  async CardPayment({
+    line_items,
+    orderId,
+    customer_email,
+    coupon,
+  }: {
+    line_items: IStripeLineItems[];
+    orderId: string;
+    customer_email?: string;
+    coupon?: number;
+  }) {
     let stripeCoupon;
     if (coupon && coupon > 0) {
       stripeCoupon = await this._PaymentService.CreateCoupon(coupon);
@@ -138,7 +166,7 @@ export class OrderService {
     return await this._PaymentService.CreatePaymentSession({
       line_items,
       ...(customer_email && { customer_email }),
-      ...(stripeCoupon && { discounts: [{ coupon: stripeCoupon }] }),
+      ...(stripeCoupon && { discounts: [{ coupon: stripeCoupon.id }] }),
       metadata: {
         orderId,
       },

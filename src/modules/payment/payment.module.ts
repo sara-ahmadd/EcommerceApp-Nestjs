@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { PaymentService } from './payment.service';
-import { PaymentProvider } from 'src/common/providers/payment.provider';
+import { PaymentProvider } from './../../common/providers/payment.provider';
 
 @Module({
   imports: [],

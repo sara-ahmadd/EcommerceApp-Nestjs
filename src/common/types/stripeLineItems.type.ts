@@ -1,8 +1,11 @@
 export interface IStripeLineItems {
-  product_data: {
-    name: string;
-    images: string[];
+  price_data: {
+    currency: string;
     unit_amount: number;
+    product_data: {
+      name: string;
+      images: string[];
+    };
   };
   quantity: number;
 }

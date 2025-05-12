@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
+import * as express from 'express';
 import './utils/mongoos-pginate';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
@@ -8,6 +9,9 @@ import { ErrorHandlerInterceptor } from './common/interceptors/errorHandling.int
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.use('/webhook', express.raw({ type: 'application/json' }));
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -30,6 +34,7 @@ async function bootstrap() {
       },
     }),
   );
+
   app.useGlobalInterceptors(
     new ResponseInterceptor(),
     new ErrorHandlerInterceptor(),
