@@ -10,7 +10,7 @@ import { ErrorHandlerInterceptor } from './common/interceptors/errorHandling.int
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.use('/webhook', express.raw({ type: 'application/json' }));
+  // app.use('/webhook', express.raw({ type: 'application/json' }));
 
   app.useGlobalPipes(
     new ValidationPipe({

@@ -4,6 +4,13 @@ import { Public } from './../../common/decorators/public.decorator';
 import { STRIPE_PAYMENT } from './../../common/providers/payment.provider';
 import Stripe from 'stripe';
 import { Request } from 'express';
+import { buffer } from 'micro';
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
 
 @Public()
 @Controller('/webhook')
@@ -13,15 +20,16 @@ export class PaymentController {
     private readonly _ConfigService: ConfigService,
   ) {}
   @Post('/')
-  stripeWebHook(
+  async stripeWebHook(
     @Req() req: Request,
     @Headers('stripe-signature') stripeSign: string,
   ) {
+    const buf = await buffer(req);
     let event = req['rawBody'];
     const endpointSecret = this._ConfigService.get('WEB_HOOK_SECRET');
     try {
       event = this.stripe.webhooks.constructEvent(
-        req['rawBody'],
+        buf,
         stripeSign,
         endpointSecret,
       );
