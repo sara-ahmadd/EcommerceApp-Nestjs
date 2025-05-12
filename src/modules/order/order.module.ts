@@ -9,6 +9,7 @@ import { SubCategoryModule } from '../sub-category/sub-category.module';
 import { OrderController } from './order.controller';
 import { OrderRepo } from './order.repository';
 import { OrderService } from './order.service';
+import { PaymentModule } from '../payment/payment.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { OrderService } from './order.service';
     BrandModule,
     ProductModule,
     CartModule,
+    PaymentModule,
   ],
   controllers: [OrderController],
   providers: [OrderService, OrderRepo],

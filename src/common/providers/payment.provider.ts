@@ -8,5 +8,5 @@ export const PaymentProvider = {
   useFactory: (_ConfigService: ConfigService) => {
     return new Stripe(_ConfigService.get('SECRET_KEY')!);
   },
-  Inject: [ConfigService],
+  inject: [ConfigService],
 };
