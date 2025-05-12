@@ -10,14 +10,17 @@ import { OrderRepo } from './order.repository';
 import { CouponService } from '../coupon/coupon.service';
 import { ProductService } from '../product/product.service';
 import { PaymentMethods } from './../../common/types/paymentMethods.type';
+import { PaymentService } from '../payment/payment.service';
+import { IStripeLineItems } from './../../common/types/stripeLineItems.type';
 
 @Injectable()
 export class OrderService {
   constructor(
-    private _CartService: CartService,
-    private _CouponService: CouponService,
-    private _OrderRepo: OrderRepo,
-    private _ProductService: ProductService,
+    private readonly _CartService: CartService,
+    private readonly _CouponService: CouponService,
+    private readonly _OrderRepo: OrderRepo,
+    private readonly _ProductService: ProductService,
+    private readonly _PaymentService: PaymentService,
   ) {}
   async createOrder(userId: Types.ObjectId, body: CreateOrderDto) {
     const { paymentMethod, coupon } = body;
@@ -51,16 +54,30 @@ export class OrderService {
     }
     let totalCost = 0;
     let totalAmount = 0;
-    for (const product of userCart.cart?.products) {
-      totalCost += product.product.price * product.quantity;
-      totalAmount += product.quantity;
-    }
+    const cart: any[] = [];
 
-    const cart = userCart.cart?.products.map((item) => ({
-      product: item.product._id,
-      quantity: item.quantity,
-      price: item.product.price * item.quantity,
-    }));
+    //get line items array for card payment method (handeled using stripe)
+    const line_items: IStripeLineItems[] = [];
+
+    for (const product of userCart.cart?.products) {
+      totalCost += Number(product.product.finalPrice) * product.quantity;
+      totalAmount += product.quantity;
+
+      cart.push({
+        product: product.product._id,
+        quantity: product.quantity,
+        price: Number(product.product.finalPrice) * product.quantity,
+      });
+
+      line_items.push({
+        product_data: {
+          name: product.product.name,
+          images: [...product.product.images.map((img) => img.secure_url)],
+          unit_amount: Number(product.product.finalPrice),
+        },
+        quantity: product.quantity,
+      });
+    }
 
     const couponDiscount = getCoupon?.coupon.discount;
     const isPercent = getCoupon?.coupon.isPercentage;
@@ -94,10 +111,37 @@ export class OrderService {
       }
       //clear user cart after order is created successfully
       await this._CartService.clearCart(userId);
+      return {
+        message: 'Order is created successfully',
+        order,
+      };
     }
+    const session = await this.CardPayment(line_items, order.id);
     return {
       message: 'Order is created successfully',
+      session: session.url,
       order,
     };
+  }
+
+  async CardPayment(
+    line_items: IStripeLineItems[],
+    orderId: string,
+    customer_email?: string,
+    coupon?: number,
+  ) {
+    let stripeCoupon;
+    if (coupon && coupon > 0) {
+      stripeCoupon = await this._PaymentService.CreateCoupon(coupon);
+    }
+
+    return await this._PaymentService.CreatePaymentSession({
+      line_items,
+      ...(customer_email && { customer_email }),
+      ...(stripeCoupon && { discounts: [{ coupon: stripeCoupon }] }),
+      metadata: {
+        orderId,
+      },
+    });
   }
 }

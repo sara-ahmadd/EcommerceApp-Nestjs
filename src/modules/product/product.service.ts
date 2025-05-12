@@ -40,8 +40,17 @@ export class ProductService {
     userId: Types.ObjectId,
     files: IFiles,
   ) {
-    const { name, price, stock, description, category, sub_category, brand } =
-      body;
+    const {
+      name,
+      price,
+      stock,
+      description,
+      category,
+      sub_category,
+      brand,
+      discount,
+      isPercentage,
+    } = body;
 
     //check : category, subcategory, brand
     const checkCategory = await this._CategoryRepo.findOne({
@@ -77,6 +86,7 @@ export class ProductService {
       lowerCaseAlphabets: true,
       upperCaseAlphabets: true,
       digits: true,
+      specialChars: false,
     });
 
     const folder = `${this._ConfigService.get('CLOUD_APP_FOLDER')}/products/${randomeId}`;
@@ -107,6 +117,9 @@ export class ProductService {
         createdBy: userId,
         category: new Types.ObjectId(category),
         ...(sub_category && { sub_category: new Types.ObjectId(sub_category) }),
+        ...(discount && {
+          discount: { amount: discount, isPercentage: isPercentage || true },
+        }),
         brand: new Types.ObjectId(brand),
         thumbnail,
         images,

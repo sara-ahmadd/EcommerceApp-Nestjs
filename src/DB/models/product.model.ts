@@ -34,7 +34,15 @@ export class Product {
   })
   description: string;
 
-  @Prop({ type: Number, min: 1, required: true })
+  @Prop({
+    type: Number,
+    min: 1,
+    required: true,
+    set: function (value: number) {
+      this.finalPrice = value;
+      return value;
+    },
+  })
   price: number;
 
   @Prop({ type: Number, min: 1, required: true })
@@ -66,6 +74,17 @@ export class Product {
 
   @Prop({ type: Types.ObjectId, ref: UserModelName })
   createdBy: Types.ObjectId;
+
+  @Prop(
+    raw({
+      amount: { type: Number },
+      isPercentage: { type: Boolean },
+    }),
+  )
+  discount: { amount: number; isPercentage: boolean };
+
+  @Prop({ type: Number })
+  finalPrice: Number;
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);
@@ -84,6 +103,13 @@ export const ProductModel = MongooseModule.forFeatureAsync([
           next();
         },
       );
+      ProductSchema.pre('save', function (next) {
+        this.finalPrice =
+          this.discount.amount > 0
+            ? this.price - (this.price * this.discount.amount) / 100
+            : this.price;
+        next();
+      });
       return ProductSchema;
     },
     inject: [FileServices],

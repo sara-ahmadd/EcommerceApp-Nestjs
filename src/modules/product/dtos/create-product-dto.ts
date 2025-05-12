@@ -1,5 +1,13 @@
 import { Type } from 'class-transformer';
-import { IsMongoId, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsMongoId,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 import { Types } from 'mongoose';
 
 export class CreateProductDto {
@@ -27,4 +35,12 @@ export class CreateProductDto {
   @IsMongoId()
   @IsNotEmpty()
   brand: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  discount?: number;
+
+  @IsOptional()
+  @Type(() => Boolean)
+  isPercentage?: boolean;
 }
