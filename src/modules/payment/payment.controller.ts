@@ -1,8 +1,9 @@
-import { Body, Controller, Headers, Inject, Post } from '@nestjs/common';
+import { Body, Controller, Headers, Inject, Post, Req } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Public } from './../../common/decorators/public.decorator';
 import { STRIPE_PAYMENT } from './../../common/providers/payment.provider';
 import Stripe from 'stripe';
+import { Request } from 'express';
 
 @Public()
 @Controller('/webhook')
@@ -13,14 +14,14 @@ export class PaymentController {
   ) {}
   @Post('/')
   stripeWebHook(
-    @Body() body: any,
+    @Req() req: Request,
     @Headers('stripe-signature') stripeSign: string,
   ) {
-    let event = body;
+    let event = req.body;
     const endpointSecret = this._ConfigService.get('WEB_HOOK_SECRET');
     try {
       event = this.stripe.webhooks.constructEvent(
-        body,
+        req.body,
         stripeSign,
         endpointSecret,
       );
