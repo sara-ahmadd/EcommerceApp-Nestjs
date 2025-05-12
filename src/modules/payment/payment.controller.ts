@@ -17,11 +17,11 @@ export class PaymentController {
     @Req() req: Request,
     @Headers('stripe-signature') stripeSign: string,
   ) {
-    let event = req.body;
+    let event = req['rawBody'];
     const endpointSecret = this._ConfigService.get('WEB_HOOK_SECRET');
     try {
       event = this.stripe.webhooks.constructEvent(
-        req.body,
+        req['rawBody'],
         stripeSign,
         endpointSecret,
       );
