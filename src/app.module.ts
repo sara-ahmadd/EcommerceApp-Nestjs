@@ -20,6 +20,8 @@ import { OrderModule } from './modules/order/order.module';
 import { CouponModule } from './modules/coupon/coupon.module';
 import { SocketModule } from './modules/socket/socket.module';
 import { PaymentController } from './modules/payment/payment.controller';
+import { PaymentModule } from './modules/payment/payment.module';
+import { PaymentProvider } from './common/providers/payment.provider';
 
 @Module({
   imports: [
@@ -54,10 +56,12 @@ import { PaymentController } from './modules/payment/payment.controller';
     ReviewModule,
     OrderModule,
     CouponModule,
+    PaymentModule,
   ],
   controllers: [AppController, PaymentController],
   providers: [
     AppService,
+    PaymentProvider,
     {
       provide: APP_GUARD,
       useClass: AuthGuard, //authentication guard
