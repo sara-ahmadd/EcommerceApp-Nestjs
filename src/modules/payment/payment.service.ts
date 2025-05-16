@@ -41,13 +41,6 @@ export class PaymentService {
       await this.stripe.customers.create({ email: userEmail })
     ).id;
 
-    await this.stripe.invoiceItems.create({
-      customer: customerId,
-      amount,
-      currency: 'egp',
-      description: msg,
-    });
-
     // Create the invoice
     const invoice = await this.stripe.invoices.create({
       customer: customerId,

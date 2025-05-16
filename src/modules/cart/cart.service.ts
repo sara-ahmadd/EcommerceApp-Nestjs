@@ -39,7 +39,10 @@ export class CartService {
       (item) => String(item.product) === String(body.product_id),
     );
     if (!checkProduct) {
-      cart?.products.push({ product: body.product_id, quantity: 1 });
+      cart?.products.push({
+        product: body.product_id,
+        quantity: body.quantity || 1,
+      });
       await cart?.save();
       const updatedCart = await this._CartRepo.findOne({
         filter: { user: user._id },

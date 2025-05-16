@@ -11,6 +11,9 @@ import { OrderRepo } from './order.repository';
 import { OrderService } from './order.service';
 import { PaymentModule } from '../payment/payment.module';
 import { UserModule } from '../user/user.module';
+import { InvoiceService } from 'src/common/invoice/invoice.service';
+import { FileModule } from 'src/common/fileUpload/file.module';
+import { InvoiceModule } from 'src/common/invoice/invoice.module';
 
 @Module({
   imports: [
@@ -23,6 +26,8 @@ import { UserModule } from '../user/user.module';
     CartModule,
     PaymentModule,
     UserModule,
+    FileModule,
+    InvoiceModule,
   ],
   controllers: [OrderController],
   providers: [OrderService, OrderRepo],

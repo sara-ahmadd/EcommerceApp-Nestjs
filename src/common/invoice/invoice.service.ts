@@ -33,11 +33,11 @@ export class InvoiceService {
 
     doc.fontSize(14).text('Items:');
     invoiceData.items.forEach((item) => {
-      doc.text(`${item.description}: $${(item.amount / 100).toFixed(2)}`);
+      doc.text(`${item.description}: $${item.amount.toFixed(2)}`);
     });
 
     doc.moveDown();
-    doc.fontSize(16).text(`Total: $${(invoiceData.total / 100).toFixed(2)}`, {
+    doc.fontSize(16).text(`Total: $${invoiceData.total.toFixed(2)}`, {
       align: 'right',
     });
 

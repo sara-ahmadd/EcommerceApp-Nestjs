@@ -20,7 +20,6 @@ import { UpdateProdQuantityDto } from './dtos/update-quantity.dto';
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
-  @Roles(UserRoles.vendor)
   @Post('/add_product')
   addProduct(@Body() body: AddProductDto, @User() user: Partial<UserDocument>) {
     return this.cartService.addProduct(body, user);

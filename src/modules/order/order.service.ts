@@ -3,7 +3,9 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Types } from 'mongoose';
+import { FilterQuery, Types } from 'mongoose';
+import * as fs from 'fs';
+import * as path from 'path';
 import { CreateOrderDto } from './dtos/create-order.dto';
 import { CartService } from '../cart/cart.service';
 import { OrderRepo } from './order.repository';
@@ -16,6 +18,11 @@ import { CouponDocument } from './../../DB/models/coupon.model';
 import Stripe from 'stripe';
 import { OrderStatus } from 'src/common/types/orderEnum.type';
 import { UserService } from '../user/user.service';
+import { InvoiceService } from 'src/common/invoice/invoice.service';
+import { generate } from 'otp-generator';
+import { FileServices } from 'src/common/fileUpload/fileUpload.service';
+import { ConfigService } from '@nestjs/config';
+import { OrderDocument } from 'src/DB/models/order.model';
 
 @Injectable()
 export class OrderService {
@@ -26,6 +33,9 @@ export class OrderService {
     private readonly _ProductService: ProductService,
     private readonly _PaymentService: PaymentService,
     private readonly _UserService: UserService,
+    private readonly _InvoiceService: InvoiceService,
+    private readonly _FileServices: FileServices,
+    private readonly _ConfigService: ConfigService,
   ) {}
   async createOrder(userId: Types.ObjectId, body: CreateOrderDto) {
     const { paymentMethod, coupon } = body;
@@ -114,7 +124,7 @@ export class OrderService {
         products: cart,
         totaQuantity: totalAmount,
         totalCost,
-        ...(paymentMethod && { paymentMethod: paymentMethod }),
+        paymentMethod: paymentMethod ? paymentMethod : PaymentMethods.cash,
         ...(coupon && { coupon: getCoupon?.coupon._id }),
         finalPrice:
           coupon && getCoupon
@@ -124,7 +134,46 @@ export class OrderService {
             : totalCost,
       },
     });
+    const user = await this._UserService.getUser({ filter: { _id: userId } });
+    const invoiceId = generate(20);
 
+    const invoice = await this._InvoiceService.generateInvoicePDF({
+      customerName: user?.name!,
+      email: user?.email!,
+      items: [
+        ...userCart.cart.products.map((item) => ({
+          description: item.product.description,
+          amount: item.quantity,
+        })),
+      ],
+      total: order.finalPrice,
+      invoiceId,
+    });
+    if (invoice) {
+      // // Read the PDF file and create a mock Express.Multer.File object
+
+      const buffer = fs.readFileSync(invoice);
+      const file: Express.Multer.File = {
+        fieldname: 'file',
+        originalname: path.basename(invoice),
+        encoding: '7bit',
+        mimetype: 'application/pdf',
+        size: buffer.length,
+        buffer,
+        destination: '',
+        filename: path.basename(invoice),
+        path: invoice,
+        stream: fs.createReadStream(invoice),
+      };
+      const { secure_url, public_id } = await this._FileServices.uploadFile(
+        {
+          folder: `${this._ConfigService.get('CLOUD_APP_FOLDER')}/invoices/${invoiceId}`,
+        },
+        file,
+      );
+      order.invoice = secure_url;
+      await order.save();
+    }
     if (order.paymentMethod === PaymentMethods.cash) {
       //update stock of all products in the order
       for (const prod of cart) {
@@ -137,6 +186,7 @@ export class OrderService {
       }
       //clear user cart after order is created successfully
       await this._CartService.clearCart(userId);
+
       return {
         message: 'Order is created successfully',
         order,
@@ -191,6 +241,12 @@ export class OrderService {
     }
     return { message: 'Order is fetched successfully', order };
   }
+
+  async getUserOrders(filter: FilterQuery<OrderDocument>) {
+    const order = await this._OrderRepo.findAll({ filter });
+    return order;
+  }
+
   async getAllOrders(userId: Types.ObjectId) {
     const orders = await this._OrderRepo.findAll({
       filter: { user: userId },
@@ -234,15 +290,6 @@ export class OrderService {
     const user = await this._UserService.getUser({
       filter: { _id: order.user },
     });
-
-    const createInvoice = await this._PaymentService.createInvoice(
-      user?.email!,
-      order.finalPrice,
-      'Invoice of your order from EcommerceApp',
-    );
-
-    order.invoice = createInvoice!;
-    await order.save();
 
     //empty users cart
     const userId = order.user;
