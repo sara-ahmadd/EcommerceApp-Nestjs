@@ -49,9 +49,6 @@ export class PaymentController {
         new Types.ObjectId(orderId),
         true,
       );
-      order.paid = true;
-
-      await order.save();
 
       const userId = order.user;
       const clearUserCart = await this._CartService.clearCart(userId);
