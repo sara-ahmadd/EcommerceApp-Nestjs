@@ -46,26 +46,8 @@ export class PaymentController {
       console.log({ session });
       const orderId = session?.metadata?.orderId;
       const paymentIntent = session?.payment_intent;
-      //covert order.paid to true
-      const order = await this._OrderService.updateOrderPaidState(
-        new Types.ObjectId(orderId),
-        paymentIntent,
-        true,
-      );
-      //empty users cart
-      const userId = order.user;
-      const cart = await this._CartService.getCart(userId);
-      //update stock of all products in the order
-      for (const prod of cart.cart.products) {
-        //update product stock on DB and notify all users with the new stock using socketio
-        await this._ProductService.updateProductStock(
-          prod.product._id,
-          prod.quantity,
-          false,
-        );
-      }
-      const clearUserCart = await this._CartService.clearCart(userId);
-      console.log({ clearUserCart });
+
+      await this._OrderService.checkoutCompleted(orderId!, paymentIntent);
     }
   }
 }

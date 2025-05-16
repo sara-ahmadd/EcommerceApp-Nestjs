@@ -14,6 +14,7 @@ import { PaymentService } from '../payment/payment.service';
 import { IStripeLineItems } from './../../common/types/stripeLineItems.type';
 import { CouponDocument } from './../../DB/models/coupon.model';
 import Stripe from 'stripe';
+import { OrderStatus } from 'src/common/types/orderEnum.type';
 
 @Injectable()
 export class OrderService {
@@ -198,6 +199,7 @@ export class OrderService {
     });
     return { message: 'Orders are fetched successfully', orders };
   }
+
   async updateOrderPaidState(
     orderId: Types.ObjectId,
     paymentIntent: Stripe.PaymentIntent | string | null,
@@ -212,5 +214,57 @@ export class OrderService {
       throw new NotFoundException('Order is not found');
     }
     return order;
+  }
+
+  async checkoutCompleted(
+    orderId: string,
+    paymentIntent: string | Stripe.PaymentIntent | null,
+  ) {
+    //covert order.paid to true
+    const order = await this.updateOrderPaidState(
+      new Types.ObjectId(orderId),
+      paymentIntent,
+      true,
+    );
+    //empty users cart
+    const userId = order.user;
+    const cart = await this._CartService.getCart(userId);
+    //update stock of all products in the order
+    for (const prod of cart.cart.products) {
+      //update product stock on DB and notify all users with the new stock using socketio
+      await this._ProductService.updateProductStock(
+        prod.product._id,
+        prod.quantity,
+        false,
+      );
+    }
+    const clearUserCart = await this._CartService.clearCart(userId);
+    console.log({ clearUserCart });
+  }
+
+  async cancelOrder(orderId: Types.ObjectId, userId: Types.ObjectId) {
+    const order = await this._OrderRepo.findOne({
+      filter: { _id: orderId, user: userId },
+    });
+    if (!order) {
+      throw new NotFoundException('Order is not found');
+    }
+
+    const paymentIntent = order.paymentIntent;
+    if (order.paymentMethod == PaymentMethods.card_online) {
+      await this._PaymentService.refund(paymentIntent);
+    }
+    order.status = OrderStatus.cancelled;
+    await order.save();
+
+    //update stock of all products
+    for (const prod of order.products) {
+      await this._ProductService.updateProductStock(
+        prod.product._id,
+        prod.quantity,
+        false,
+      );
+    }
+    return { message: 'Order is cancelled successfully' };
   }
 }

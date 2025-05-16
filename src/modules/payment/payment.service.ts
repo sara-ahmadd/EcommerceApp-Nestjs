@@ -31,4 +31,8 @@ export class PaymentService {
       percent_off,
     });
   }
+
+  async refund(payment_intent) {
+    return this.stripe.refunds.create({ payment_intent });
+  }
 }
