@@ -40,7 +40,7 @@ export class CreateUserDto {
   @IsNotEmpty()
   address: string;
 
-  @IsEnum(UserRoles)
+  @IsEnum([UserRoles.customer, UserRoles.vendor])
   @IsOptional()
   role: string;
 }

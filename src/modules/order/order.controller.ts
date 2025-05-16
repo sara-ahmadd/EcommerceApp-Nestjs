@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dtos/create-order.dto';
 import { User } from './../../common/decorators/user.decorator';
@@ -13,5 +13,15 @@ export class OrderController {
     @User('_id') userId: Types.ObjectId,
   ) {
     return this.orderService.createOrder(userId, body);
+  }
+
+  @Get('/get_order/:id')
+  getOrderById(@Param('id') orderId: Types.ObjectId) {
+    return this.orderService.getOrderById(orderId);
+  }
+
+  @Get('/all')
+  getOrders(@User('_id') userId: Types.ObjectId) {
+    return this.orderService.getAllOrders(userId);
   }
 }

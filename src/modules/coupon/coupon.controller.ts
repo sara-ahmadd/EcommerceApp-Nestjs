@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseBoolPipe,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { Types } from 'mongoose';
 import { UserRoles } from '../user/dtos/create-user.dto';
 import { Roles } from './../../common/decorators/roles.decorator';
@@ -6,11 +16,11 @@ import { User } from './../../common/decorators/user.decorator';
 import { CouponService } from './coupon.service';
 import { CreateCouponDto } from './dtos/create-coupon.dto';
 
+@Roles(UserRoles.admin)
 @Controller('coupon')
 export class CouponController {
   constructor(private readonly couponService: CouponService) {}
 
-  @Roles(UserRoles.admin)
   @Post('/create')
   createCoupon(
     @Body() body: CreateCouponDto,
@@ -19,9 +29,26 @@ export class CouponController {
     return this.couponService.createCoupon(body, userId);
   }
 
-  @Roles(UserRoles.admin)
-  @Get('/:code')
+  @Get('/get_coupon/:code')
   getCoupon(@Param('code') code: string) {
     return this.couponService.getCouponByCode(code);
+  }
+
+  @Delete('/delete_coupon/:id')
+  deleteCoupon(@Param('id') couponId: Types.ObjectId) {
+    return this.couponService.deleteCouponByCode(couponId);
+  }
+
+  @Get('/all')
+  getAllCoupons() {
+    return this.couponService.getAllCoupuns();
+  }
+
+  @Patch('/activate/:id')
+  activateCoupon(
+    @Param('id') couponId: Types.ObjectId,
+    @Query('state', ParseBoolPipe) state: boolean,
+  ) {
+    return this.couponService.activateCoupon(couponId, state);
   }
 }

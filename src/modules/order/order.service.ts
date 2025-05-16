@@ -13,6 +13,7 @@ import { PaymentMethods } from './../../common/types/paymentMethods.type';
 import { PaymentService } from '../payment/payment.service';
 import { IStripeLineItems } from './../../common/types/stripeLineItems.type';
 import { CouponDocument } from './../../DB/models/coupon.model';
+import Stripe from 'stripe';
 
 @Injectable()
 export class OrderService {
@@ -173,10 +174,38 @@ export class OrderService {
     });
   }
 
-  async updateOrderPaidState(orderId: Types.ObjectId, paidState: boolean) {
+  async getOrderById(orderId: Types.ObjectId) {
+    const order = await this._OrderRepo.findOne({
+      filter: { _id: orderId },
+      populate: [{ path: 'products.product' }],
+    });
+
+    if (!order) {
+      throw new NotFoundException('Order is not found');
+    }
+    return { message: 'Order is fetched successfully', order };
+  }
+  async getAllOrders(userId: Types.ObjectId) {
+    const orders = await this._OrderRepo.findAll({
+      filter: { user: userId },
+      populate: [
+        { path: 'products.product' },
+        {
+          path: 'coupon',
+          select: 'code discount isActive isPercentage',
+        },
+      ],
+    });
+    return { message: 'Orders are fetched successfully', orders };
+  }
+  async updateOrderPaidState(
+    orderId: Types.ObjectId,
+    paymentIntent: Stripe.PaymentIntent | string | null,
+    paidState: boolean,
+  ) {
     const order = await this._OrderRepo.updateOne({
       filter: { _id: orderId },
-      updatedFields: { paid: paidState },
+      updatedFields: { paid: paidState, paymentIntent },
     });
 
     if (!order) {

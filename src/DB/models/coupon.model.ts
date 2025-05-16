@@ -19,7 +19,7 @@ class Coupon {
   @Prop({ type: Date, required: true })
   expiresAt: Date;
 
-  @Prop({ type: Boolean, default: false })
+  @Prop({ type: Boolean, default: true })
   isActive: boolean;
 }
 
