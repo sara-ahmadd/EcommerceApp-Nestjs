@@ -93,7 +93,10 @@ export class OrderService {
             (product.product.finalPrice || product.product.price) * 100,
           product_data: {
             name: product.product.name,
-            images: [...product.product.images.map((img) => img.secure_url)],
+            images: [
+              ...product.product.images.map((img) => img.secure_url),
+              product.product.thumbnail.secure_url,
+            ],
           },
         },
         quantity: product.quantity,
