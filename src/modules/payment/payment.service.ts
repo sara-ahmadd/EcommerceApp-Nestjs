@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { STRIPE_PAYMENT } from './../../common/providers/payment.provider';
 import Stripe from 'stripe';
 
@@ -48,11 +48,19 @@ export class PaymentService {
       description: msg,
     });
 
+    // Create the invoice
     const invoice = await this.stripe.invoices.create({
       customer: customerId,
-      auto_advance: true,
+      collection_method: 'send_invoice',
+      days_until_due: 7,
     });
+    if (!invoice) throw new BadRequestException('invoice cannot be created');
+    // Finalize the invoice to generate the hosted link
+    const finalizedInvoice = await this.stripe.invoices.finalizeInvoice(
+      invoice?.id!,
+    );
 
-    return invoice;
+    // Return the hosted invoice URL
+    return finalizedInvoice.hosted_invoice_url;
   }
 }

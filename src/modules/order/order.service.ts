@@ -241,7 +241,7 @@ export class OrderService {
       'Invoice of your order from EcommerceApp',
     );
 
-    order.invoice = createInvoice.lines.url;
+    order.invoice = createInvoice!;
     await order.save();
 
     //empty users cart
