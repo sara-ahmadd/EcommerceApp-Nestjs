@@ -173,8 +173,11 @@ export class OrderService {
     });
   }
 
-  async getOrderById(orderId: Types.ObjectId) {
-    const order = await this._OrderRepo.findOne({ filter: { _id: orderId } });
+  async updateOrderPaidState(orderId: Types.ObjectId, paidState: boolean) {
+    const order = await this._OrderRepo.updateOne({
+      filter: { _id: orderId },
+      updatedFields: { paid: paidState },
+    });
 
     if (!order) {
       throw new NotFoundException('Order is not found');

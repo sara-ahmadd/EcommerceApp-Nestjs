@@ -43,10 +43,11 @@ export class PaymentController {
       const session = event.data.object as Stripe.Checkout.Session;
       console.log({ session });
       const orderId = session?.metadata?.orderId;
-      //covert oserd.paid to true
+      //covert order.paid to true
       //empty users cart
-      const order = await this._OrderService.getOrderById(
+      const order = await this._OrderService.updateOrderPaidState(
         new Types.ObjectId(orderId),
+        true,
       );
       order.paid = true;
 
