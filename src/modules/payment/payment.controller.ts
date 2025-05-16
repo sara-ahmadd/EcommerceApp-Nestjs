@@ -7,6 +7,7 @@ import { Request } from 'express';
 import { OrderService } from '../order/order.service';
 import { Types } from 'mongoose';
 import { CartService } from '../cart/cart.service';
+import { ProductService } from '../product/product.service';
 
 export const config = {
   api: {
@@ -22,6 +23,7 @@ export class PaymentController {
     private readonly _ConfigService: ConfigService,
     private readonly _OrderService: OrderService,
     private readonly _CartService: CartService,
+    private readonly _ProductService: ProductService,
   ) {}
   @Post('/')
   async stripeWebHook(
@@ -44,13 +46,22 @@ export class PaymentController {
       console.log({ session });
       const orderId = session?.metadata?.orderId;
       //covert order.paid to true
-      //empty users cart
       const order = await this._OrderService.updateOrderPaidState(
         new Types.ObjectId(orderId),
         true,
       );
-
+      //empty users cart
       const userId = order.user;
+      const cart = await this._CartService.getCart(userId);
+      //update stock of all products in the order
+      for (const prod of cart.cart.products) {
+        //update product stock on DB and notify all users with the new stock using socketio
+        await this._ProductService.updateProductStock(
+          prod.product._id,
+          prod.quantity,
+          false,
+        );
+      }
       const clearUserCart = await this._CartService.clearCart(userId);
       console.log({ clearUserCart });
     }
