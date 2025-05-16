@@ -172,4 +172,13 @@ export class OrderService {
       },
     });
   }
+
+  async getOrderById(orderId: Types.ObjectId) {
+    const order = await this._OrderRepo.findOne({ filter: { _id: orderId } });
+
+    if (!order) {
+      throw new NotFoundException('Order is not found');
+    }
+    return order;
+  }
 }

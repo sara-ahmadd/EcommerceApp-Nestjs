@@ -58,7 +58,7 @@ import { PaymentProvider } from './common/providers/payment.provider';
     CouponModule,
     PaymentModule,
   ],
-  controllers: [AppController, PaymentController],
+  controllers: [AppController],
   providers: [
     AppService,
     PaymentProvider,
