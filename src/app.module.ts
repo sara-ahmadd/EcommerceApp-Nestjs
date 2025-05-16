@@ -19,7 +19,7 @@ import { ReviewModule } from './modules/review/review.module';
 import { OrderModule } from './modules/order/order.module';
 import { CouponModule } from './modules/coupon/coupon.module';
 import { SocketModule } from './modules/socket/socket.module';
-// import { PaymentController } from './modules/payment/payment.controller';
+import { PaymentController } from './modules/payment/payment.controller';
 import { PaymentModule } from './modules/payment/payment.module';
 import { PaymentProvider } from './common/providers/payment.provider';
 
@@ -58,7 +58,7 @@ import { PaymentProvider } from './common/providers/payment.provider';
     CouponModule,
     PaymentModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, PaymentController],
   providers: [
     AppService,
     PaymentProvider,
