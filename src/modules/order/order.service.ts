@@ -15,6 +15,7 @@ import { IStripeLineItems } from './../../common/types/stripeLineItems.type';
 import { CouponDocument } from './../../DB/models/coupon.model';
 import Stripe from 'stripe';
 import { OrderStatus } from 'src/common/types/orderEnum.type';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class OrderService {
@@ -24,6 +25,7 @@ export class OrderService {
     private readonly _OrderRepo: OrderRepo,
     private readonly _ProductService: ProductService,
     private readonly _PaymentService: PaymentService,
+    private readonly _UserService: UserService,
   ) {}
   async createOrder(userId: Types.ObjectId, body: CreateOrderDto) {
     const { paymentMethod, coupon } = body;
@@ -229,8 +231,22 @@ export class OrderService {
       paymentIntent,
       true,
     );
+    const user = await this._UserService.getUser({
+      filter: { _id: order.user },
+    });
+
+    const createInvoice = await this._PaymentService.createInvoice(
+      user?.email!,
+      order.finalPrice,
+      'Invoice of your order from EcommerceApp',
+    );
+
+    order.invoice = createInvoice.lines.url;
+    await order.save();
+
     //empty users cart
     const userId = order.user;
+
     const cart = await this._CartService.getCart(userId);
     //update stock of all products in the order
     for (const prod of cart.cart.products) {
@@ -258,14 +274,15 @@ export class OrderService {
       await this._PaymentService.refund(paymentIntent);
     }
     order.status = OrderStatus.cancelled;
+    order.paid = false;
     await order.save();
 
-    //update stock of all products
+    //update stock of all products (increment)
     for (const prod of order.products) {
       await this._ProductService.updateProductStock(
         prod.product._id,
         prod.quantity,
-        false,
+        true,
       );
     }
     return { message: 'Order is cancelled successfully' };

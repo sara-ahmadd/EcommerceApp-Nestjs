@@ -43,6 +43,9 @@ class Order {
   @Prop({ type: String })
   paymentIntent: string;
 
+  @Prop({ type: String })
+  invoice: string;
+
   @Prop({ type: Types.ObjectId, ref: CouponModelName })
   coupon: Types.ObjectId;
 

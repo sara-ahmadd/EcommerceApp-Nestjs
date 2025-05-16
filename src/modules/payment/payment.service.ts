@@ -35,4 +35,24 @@ export class PaymentService {
   async refund(payment_intent) {
     return this.stripe.refunds.create({ payment_intent });
   }
+
+  async createInvoice(userEmail: string, amount: number, msg: string) {
+    const customerId = (
+      await this.stripe.customers.create({ email: userEmail })
+    ).id;
+
+    await this.stripe.invoiceItems.create({
+      customer: customerId,
+      amount,
+      currency: 'egp',
+      description: msg,
+    });
+
+    const invoice = await this.stripe.invoices.create({
+      customer: customerId,
+      auto_advance: true,
+    });
+
+    return invoice;
+  }
 }

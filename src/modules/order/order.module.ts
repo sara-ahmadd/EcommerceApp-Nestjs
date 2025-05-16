@@ -10,6 +10,7 @@ import { OrderController } from './order.controller';
 import { OrderRepo } from './order.repository';
 import { OrderService } from './order.service';
 import { PaymentModule } from '../payment/payment.module';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { PaymentModule } from '../payment/payment.module';
     ProductModule,
     CartModule,
     PaymentModule,
+    UserModule,
   ],
   controllers: [OrderController],
   providers: [OrderService, OrderRepo],
