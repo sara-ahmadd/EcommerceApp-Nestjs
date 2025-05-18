@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { Types } from 'mongoose';
 import { Roles } from './../../common/decorators/roles.decorator';
 import { User } from './../../common/decorators/user.decorator';
@@ -21,5 +29,16 @@ export class ReviewController {
   @Get('/all')
   getAllReviews(@Query() query: GetAllReviewsDto) {
     return this.reviewService.getAllReviews(query.vendorId);
+  }
+
+  @Roles(UserRoles.admin)
+  @Get('/get_review/:id')
+  getReviewById(@Param('id') reviewId: Types.ObjectId) {
+    return this.reviewService.getReviewById(reviewId);
+  }
+  @Roles(UserRoles.admin)
+  @Delete('/delete_review/:id')
+  deleteReviewById(@Param('id') reviewId: Types.ObjectId) {
+    return this.reviewService.deleteReviewById(reviewId);
   }
 }

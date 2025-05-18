@@ -1,8 +1,13 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ReviewRepository } from './review.repository';
 import { Types } from 'mongoose';
 import { AddReviewDto } from './dtos/add-review.dto';
 import { OrderService } from '../order/order.service';
+import { populate } from 'dotenv';
 
 @Injectable()
 export class ReviewService {
@@ -37,9 +42,48 @@ export class ReviewService {
 
     reviews = await this._ReviewRepo.findAll({
       filter: {},
-      populate: { path: 'product' },
+      populate: [
+        {
+          path: 'product',
+          populate: [{ path: 'createdBy', select: 'email name' }],
+        },
+        {
+          path: 'user',
+          select: 'email name',
+        },
+      ],
+    });
+    if (vendorId) {
+      const reviewsForSpecificVendor = reviews.data?.filter(
+        (rev) => rev?.product?.createdBy?._id == vendorId,
+      );
+      return { reviews: reviewsForSpecificVendor };
+    }
+    return { reviews };
+  }
+  async getReviewById(reviewId?: Types.ObjectId) {
+    const review = await this._ReviewRepo.findOne({
+      filter: { _id: reviewId },
+      populate: [
+        {
+          path: 'product',
+          populate: [{ path: 'createdBy', select: 'email name' }],
+        },
+        {
+          path: 'user',
+          select: 'email name',
+        },
+      ],
     });
 
-    return { reviews };
+    return { message: 'Review is fteched successfully', review };
+  }
+  async deleteReviewById(reviewId?: Types.ObjectId) {
+    const review = await this._ReviewRepo.removeOne({
+      filter: { _id: reviewId },
+    });
+    if (!review.deletedCount)
+      throw new NotFoundException('review is not found');
+    return { message: 'Review is deleted successfully' };
   }
 }
