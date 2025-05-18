@@ -16,13 +16,13 @@ import { PaymentService } from '../payment/payment.service';
 import { IStripeLineItems } from './../../common/types/stripeLineItems.type';
 import { CouponDocument } from './../../DB/models/coupon.model';
 import Stripe from 'stripe';
-import { OrderStatus } from 'src/common/types/orderEnum.type';
+import { OrderStatus } from './../../common/types/orderEnum.type';
 import { UserService } from '../user/user.service';
-import { InvoiceService } from 'src/common/invoice/invoice.service';
+import { InvoiceService } from './../../common/invoice/invoice.service';
 import { generate } from 'otp-generator';
-import { FileServices } from 'src/common/fileUpload/fileUpload.service';
+import { FileServices } from './../../common/fileUpload/fileUpload.service';
 import { ConfigService } from '@nestjs/config';
-import { OrderDocument } from 'src/DB/models/order.model';
+import { OrderDocument } from './../../DB/models/order.model';
 
 @Injectable()
 export class OrderService {
